@@ -67,6 +67,11 @@ pub mod nft_candy_machine {
                 return Err(ErrorCode::NotEnoughTokens.into());
             }
 
+            // Only works if the Candy Machine's price is the same in SOL as in the `token_mint`
+            if ctx.accounts.payer.lamports() < candy_machine.data.price {
+                return Err(ErrorCode::NotEnoughSOL.into());
+            }
+
             spl_token_transfer(TokenTransferParams {
                 source: token_account_info.clone(),
                 destination: ctx.accounts.wallet.clone(),
@@ -75,6 +80,19 @@ pub mod nft_candy_machine {
                 token_program: ctx.accounts.token_program.clone(),
                 amount: candy_machine.data.price,
             })?;
+
+            invoke(
+                &system_instruction::transfer(
+                    &ctx.accounts.payer.key,
+                    ctx.accounts.wallet.key,
+                    candy_machine.data.price,
+                ),
+                &[
+                    ctx.accounts.payer.clone(),
+                    ctx.accounts.wallet.clone(),
+                    ctx.accounts.system_program.clone(),
+                ],
+            )?;
         } else {
             if ctx.accounts.payer.lamports() < candy_machine.data.price {
                 return Err(ErrorCode::NotEnoughSOL.into());
@@ -505,6 +523,7 @@ pub struct CandyMachine {
     pub authority: Pubkey,
     pub wallet: Pubkey,
     pub token_mint: Option<Pubkey>,
+    pub secondary_token_mint: Option<Pubkey>,
     pub config: Pubkey,
     pub data: CandyMachineData,
     pub items_redeemed: u64,
@@ -515,6 +534,7 @@ pub struct CandyMachine {
 pub struct CandyMachineData {
     pub uuid: String,
     pub price: u64,
+    pub secondary_price: u64,
     pub items_available: u64,
     pub go_live_date: Option<i64>,
 }
