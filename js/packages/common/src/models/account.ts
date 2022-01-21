@@ -76,6 +76,8 @@ export function approve(
   );
 
   if (autoRevoke) {
+    console.trace();
+    // This is the command that's failing
     cleanupInstructions.push(
       Token.createRevokeInstruction(tokenProgram, account, owner, []),
     );
