@@ -77,6 +77,7 @@ export async function sendCancelBid(
     ) &&
     auctionView.auction.info.ended()
   ) {
+    // Here's where we redeem
     await claimUnusedPrizes(
       connection,
       wallet,

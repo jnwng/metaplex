@@ -796,6 +796,8 @@ export async function setupRedeemParticipationInstructions(
       toPublicKey(receivingSolAccountOrAta),
       wallet.publicKey,
       price,
+      // Probably false since this token account is a PDA
+      false,
     );
 
     mySigners.push(transferAuthority);

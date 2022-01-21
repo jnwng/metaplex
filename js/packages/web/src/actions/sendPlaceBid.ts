@@ -143,6 +143,8 @@ export async function setupPlaceBid(
     toPublicKey(receivingSolAccountOrAta),
     wallet.publicKey,
     lamports - accountRentExempt,
+    // I think we should never auto-revoke, since the bidder pot is a PDA and can't be closed anyway.
+    false,
   );
 
   signers.push(transferAuthority);
